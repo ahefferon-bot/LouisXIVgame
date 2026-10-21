@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Day as the Sun King</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9eef3;--panel:#f8fafc;--ink:#17203d;--mute:#5a6480;--gold:#9a7421;--red:#8a1f2d;--line:#c5cedb;--blue:#2c4a8a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1526;--panel:#182140;--ink:#e8ecf5;--mute:#9aa5c4;--gold:#d9b25c;--red:#e57b87;--line:#2e3a63;--blue:#8fa8e8}}
+:root[data-theme="dark"]{--bg:#0f1526;--panel:#182140;--ink:#e8ecf5;--mute:#9aa5c4;--gold:#d9b25c;--red:#e57b87;--line:#2e3a63;--blue:#8fa8e8}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Work Sans",system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:28px 20px 64px}
+h1,h2,.time{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;margin:0;line-height:1.05}
+h1{font-size:clamp(2.6rem,9vw,4.2rem)}
+.lede{color:var(--mute);max-width:56ch}
+.track{display:flex;align-items:center;margin:26px 0 22px}
+.track i{flex:1;height:2px;background:var(--line)}
+.track b{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);background:var(--bg);flex:none}
+.track b.done{border-color:var(--gold);background:var(--gold)}
+.track b.now{width:22px;height:22px;border-color:var(--gold);background:radial-gradient(circle,#f6d77a,#c8962e);box-shadow:0 0 0 5px color-mix(in srgb,var(--gold) 25%,transparent)}
+.meters{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.m span{font-size:.85rem;color:var(--mute);display:flex;justify-content:space-between}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:4px}
+.bar div{height:100%;transition:width .5s}
+.scene{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--gold);padding:24px 22px;border-radius:4px}
+.time{font-size:4rem;color:var(--gold)}
+.place{color:var(--mute);margin:2px 0 14px}
+h2{font-size:2rem;margin-bottom:10px}
+button{font:inherit;cursor:pointer}
+.choice{display:block;width:100%;text-align:left;margin-top:10px;padding:13px 16px;background:transparent;color:var(--ink);border:1.5px solid var(--blue);border-radius:3px}
+.choice:hover{background:color-mix(in srgb,var(--blue) 14%,transparent)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.res{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.chips span{display:inline-block;margin:0 8px 6px 0;font-size:.85rem;font-weight:600}
+.up{color:#2d7a4a}.dn{color:var(--red)}
+@media (prefers-color-scheme:dark){.up{color:#6fd08f}}
+.hist{background:color-mix(in srgb,var(--gold) 12%,transparent);padding:12px 14px;border-radius:3px;margin:12px 0}
+.hist strong{font-family:"Cormorant Garamond",serif;font-size:1.2rem}
+.next{margin-top:12px;padding:12px 22px;background:var(--ink);color:var(--bg);border:0;border-radius:3px;font-weight:600}
+.start{margin-top:18px;font-size:1.05rem}
+ul.q{padding-left:1.2em}
+.tog{float:right;background:none;border:1px solid var(--line);color:var(--mute);border-radius:3px;padding:3px 10px;font-size:.8rem}
+.match{display:flex;gap:8px;margin:4px 0;font-size:.95rem}
+</style>
+</head>
+<body>
+<main>
+<button class="tog" id="tog" aria-label="Toggle light or dark theme">Theme</button>
+<div id="app"></div>
+</main>
+<script>
+const S=[
+{t:"8:30 am",h:"The Lever",p:"The King’s Bedchamber, Versailles",
+x:"You wake in the state bed at the centre of the palace. Courtiers wait outside, sorted by rank into groups allowed to enter at different moments. Today one of them will be given the honour of handing you your shirt.",
+c:[{t:"Keep to strict rank: the senior duke gets the honour",d:[0,1,0],r:"Everyone knows their place. The old order feels safe, which is exactly what the old nobility wants."},
+{t:"Give it to a courtier of your own choosing",k:1,d:[1,-1,0],r:"A rival duke seethes. But everyone in the room now understands that closeness to the king depends on the king alone."}],
+n:"Access was the currency of Versailles. Ranked “entrées” decided who could be in the room, so even helping the king dress was a political prize that only he could grant."},
+{t:"10:00 am",h:"The Council",p:"The Council Chamber",
+x:"A ministry has opened. A great duke says it is his birthright. Another candidate is a brilliant administrator from a merchant family, much like Jean-Baptiste Colbert.",
+c:[{t:"Appoint the great duke",d:[-1,2,-1],r:"The nobility applauds. But the duke has his own estates, clients and ambitions, and he is loyal to himself first."},
+{t:"Appoint the talented commoner",k:1,d:[2,-1,1],r:"He owes you everything and has no private army to rebel with. The great families are insulted, but your orders now get carried out."}],
+n:"When his chief minister Mazarin died in 1661, Louis announced he would rule without a replacement. He leaned on men like Colbert and Le Tellier, from newer families who depended on him. His childhood memory of the Fronde (1648–53), when nobles and parlements rose against the crown, helps explain why."},
+{t:"11:30 am",h:"A Question of Faith",p:"The Council, then Mass in the Chapel",
+x:"Advisers say the Protestants (Huguenots) are a sign of division. The Edict of Nantes, issued by your grandfather Henri IV, protects their right to worship. Bishops press you to end it. Later you will attend Mass, as you do every day, in front of the court.",
+c:[{t:"Revoke the Edict of Nantes",k:1,d:[2,1,-1],r:"Church and crown are united. But Protestant families, many of them skilled and wealthy, face forced conversion or flight."},
+{t:"Keep the edict in place",d:[-1,-1,1],r:"Peace holds and Protestant merchants stay. But the bishops and many Catholic nobles say you are too weak to defend the faith."}],
+n:"Louis revoked the Edict in 1685 with the Edict of Fontainebleau. Well over 100,000 Huguenots left France, taking skills and capital to England, the Dutch Republic and Prussia. Louis believed one king should rule one faith, and he presented himself as God’s lieutenant on earth (divine right)."},
+{t:"12:15 pm",h:"The Hall of Mirrors",p:"The Hall of Mirrors",
+x:"An embassy has arrived to apologise for offending France. The Doge of Genoa has travelled to Versailles after French ships bombarded his city. You can receive him in the vast, mirrored gallery before the whole court, or in a modest private room.",
+c:[{t:"Receive him in the Hall of Mirrors, in full splendour",k:1,d:[2,1,-1],r:"The court watches a proud republic kneel. Foreign diplomats send home reports of your glory. The display is expensive."},
+{t:"Receive him quietly in a small room",d:[-1,0,1],r:"The matter is settled cheaply. But no one outside the room sees your triumph, and a victory no one sees is worth less."}],
+n:"In 1685 the Doge of Genoa did come to Versailles to apologise after the French bombardment of 1684, and he was received in the Hall of Mirrors. Louis used architecture as diplomacy: the building was designed to overwhelm visitors and convince them that France was the greatest power in Europe."},
+{t:"1:00 pm",h:"Dinner Alone, Watched by All",p:"The King’s Bedchamber",
+x:"Your “petit couvert” is laid for one. Courtiers stand and watch in silence while servants bring dishes in careful order. A few great nobles hint that they would be honoured to dine with you.",
+c:[{t:"Dine alone, as always",k:1,d:[1,0,0],r:"No one sits in your presence unless you say so. Distance makes you more than a man."},
+{t:"Invite a few great nobles to your table",d:[-1,1,0],r:"They are delighted. But a king who eats with them is, for the first time, just one of them."}],
+n:"Even an ordinary meal was staged as ritual. Only people the king named could sit, and everything was done in an order that reminded the court who stood where."},
+{t:"2:00 pm",h:"The Tax Question",p:"Your study",
+x:"Wars and palaces are draining the treasury. Most nobles pay little or none of the main direct tax, the taille, which falls mostly on peasants. Your finance officials say the money must come from somewhere.",
+c:[{t:"Keep nobles exempt and raise money by selling offices",k:1,d:[0,1,1],r:"Cash arrives quickly and the nobility stays content. But the burden stays on those least able to bear it, and many offices are now owned by their holders."},
+{t:"Make the great nobles pay direct taxes",d:[1,-2,2],r:"The treasury improves sharply. But the nobles feel their ancient privilege has been attacked, and they remember it."}],
+n:"Louis’s government sold offices and titles to raise money, and most nobles stayed exempt from the taille. Only in the 1690s, under the pressure of war, did he introduce new taxes such as the capitation that reached nobles, and even then exemptions were widespread. Exemption was part of the unwritten bargain that kept nobles loyal."},
+{t:"3:00 pm",h:"The Gardens",p:"The Gardens designed by André Le Nôtre",
+x:"You stroll past fountains and statues of Apollo, the sun god, your own emblem. Courtiers bow in the hope you will speak to them. A duke bows who has spent months on his country estate.",
+c:[{t:"Greet him warmly",d:[-1,1,0],r:"He is flattered. But the court learns that staying away costs nothing."},
+{t:"Pass without a glance",k:1,d:[1,-1,0],r:"He turns pale. By evening the whole court knows, and so does he: he must come back and stay."}],
+n:"The duke and writer Saint-Simon described how the king noticed who was present and who was missing. Being absent from court was treated as disloyalty. The gardens themselves were propaganda, with Apollo symbolism glorifying the king."},
+{t:"4:30 pm",h:"The Intendants",p:"Your study",
+x:"Provinces far from Paris are still run by local governors, often great nobles with their own followings. You could send royal agents called intendants to oversee taxes, justice and the police, or leave things to the governors.",
+c:[{t:"Send intendants with royal commissions to each province",k:1,d:[2,-1,1],r:"Agents who owe their jobs to you now watch the provinces. They are loyal, because you can dismiss them. Local magnates grumble about interference."},
+{t:"Leave the provinces to the local governors",d:[-1,1,-1],r:"The governors are pleased. But your orders now reach the provinces only if the governors agree to carry them out."}],
+n:"Under Louis the intendants became powerful royal officials in the provinces, enforcing taxes, order and royal policy. They were usually men of modest rank who could be removed at will. This is one reason historians describe the period as a move toward centralised government, though local customs, privileges and resistance still limited royal reach."},
+{t:"7:00 pm",h:"The Evening Salons",p:"The State Apartments",
+x:"The salons are open for cards, billiards and music. A great lord has lost heavily at cards. He is quietly looking for a favour from the royal purse.",
+c:[{t:"Pay his debts from the royal purse",k:1,d:[1,2,-1],r:"He is yours for life. Meanwhile, your treasury is a little lighter."},
+{t:"Let him face the consequences",d:[0,-2,1],r:"The treasury is safe. But a ruined noble becomes a resentful one, and others take note."}],
+n:"Life at court was ruinously expensive. Pensions, gifts and posts from the king made nobles dependent on him for money instead of on their own estates and followings."},
+{t:"8:30 pm",h:"The Royal Theatre",p:"The Court Theatre",
+x:"Your composer Lully and the great playwrights have asked for generous funding for new operas and ballets. The court loves them. Your treasury officials do not.",
+c:[{t:"Fund the arts lavishly",k:1,d:[1,1,-1],r:"The court is dazzled. Nobles who once plotted now compete to attend your entertainments, and artists celebrate you in music and verse."},
+{t:"Cut the budget",d:[0,-1,1],r:"The treasury saves money. But courtiers are bored, and bored nobles have time for intrigue."}],
+n:"Louis was a lavish patron of artists, including the composer Lully and the painter Le Brun, and he founded royal academies for the arts and sciences. Culture at Versailles was a tool of rule. It glorified the king, kept the nobility entertained, and made France the model for the courts of Europe."},
+{t:"10:00 pm",h:"Supper in Public",p:"The Antechamber",
+x:"The “grand couvert” is the formal evening supper with your family. Visitors in decent dress are normally allowed to file in and watch the royal family eat.",
+c:[{t:"Keep the doors open to visitors",k:1,d:[2,0,0],r:"Hundreds see you, and the sight becomes a story they tell back home."},
+{t:"Close the doors for some privacy",d:[-1,0,0],r:"You enjoy a quiet meal. But the monarchy is less visible, and visibility was part of its power."}],
+n:"Historians like Peter Burke have written about how carefully Louis’s image was crafted. Ritual, art, architecture and spectacle all worked together to make the monarchy look permanent and glorious."},
+{t:"10:45 pm",h:"Letters by Candlelight",p:"Your cabinet",
+x:"Your war minister proposes a new campaign. It would bring glory and spoils for nobles who serve as officers, but it would be costly.",
+c:[{t:"Approve the war",k:1,d:[1,1,-2],r:"Nobles rush to command regiments and win honour for your name. The bills pile up."},
+{t:"Choose peace for now",d:[0,-1,2],r:"The treasury breathes. But a king at peace gives restless nobles nothing to do except plot."}],
+n:"Louis fought several wars, including the Dutch War, the Nine Years’ War and the War of the Spanish Succession. By 1715 France was exhausted. According to traditional accounts, he advised his young heir to avoid war and not copy his own taste for building."}
+];
+const st={i:-1,a:5,l:5,m:5,pick:[]};
+const $=document.getElementById('app'),cl=v=>Math.max(0,Math.min(10,v));
+function track(){return '<div class="track" aria-hidden="true">'+S.map((s,i)=>(i?'<i></i>':'')+'<b class="'+(i<st.i?'done':i==st.i?'now':'')+'"></b>').join('')+'</div>'}
+function meters(){const M=[['Royal authority','a','var(--gold)'],['Nobles’ loyalty','l','var(--blue)'],['Treasury','m','var(--red)']];
+return '<div class="meters">'+M.map(([n,k,c])=>'<div class="m"><span>'+n+'<b>'+st[k]+'/10</b></span><div class="bar"><div style="width:'+st[k]*10+'%;background:'+c+'"></div></div></div>').join('')+'</div>'}
+function intro(){$.innerHTML='<h1>A Day as the Sun King</h1><p class="lede">It is 1685. You are Louis XIV, king of France for over forty years, and the court has settled at Versailles. Make the choices he faced across one day. Each decision shifts your authority, the nobles’ loyalty and your treasury. If any of them falls to zero, you will be deposed. Afterwards, find out what Louis actually did and why it mattered.</p><button class="next start" id="go">Wake the king</button>';
+document.getElementById('go').onclick=()=>{st.i=0;scene()}}
+function scene(){const s=S[st.i];
+$.innerHTML='<h1 style="font-size:1.6rem;margin-bottom:0">A Day as the Sun King</h1>'+track()+meters()+'<section class="scene" aria-live="polite"><div class="time">'+s.t+'</div><div class="place">'+s.p+'</div><h2>'+s.h+'</h2><p>'+s.x+'</p><div id="ch">'+s.c.map((c,j)=>'<button class="choice" data-j="'+j+'">'+c.t+'</button>').join('')+'</div><div id="out"></div></section>';
+$.querySelectorAll('.choice').forEach(b=>b.onclick=()=>choose(+b.dataset.j))}
+function chip(l,v){return v?'<span class="'+(v>0?'up':'dn')+'">'+l+' '+(v>0?'+':'−')+Math.abs(v)+'</span>':''}
+function choose(j){const s=S[st.i],c=s.c[j];
+st.a=cl(st.a+c.d[0]);st.l=cl(st.l+c.d[1]);st.m=cl(st.m+c.d[2]);st.pick.push(!!c.k);
+const last=st.i==S.length-1,louis=s.c.find(x=>x.k).t,dead=!st.a||!st.l||!st.m;
+document.getElementById('ch').innerHTML='<button class="choice" disabled style="border-color:var(--gold);opacity:.9">You chose: '+c.t+'</button>';
+document.getElementById('out').innerHTML='<div class="res"><p>'+c.r+'</p><div class="chips">'+chip('Authority',c.d[0])+chip('Loyalty',c.d[1])+chip('Treasury',c.d[2])+'</div><div class="hist"><strong>What Louis did:</strong> '+(c.k?'He made the same choice. ':'He chose differently: “'+louis+'.” ')+s.n+'</div><button class="next" id="nx">'+(dead?'Face the consequences':last?'End the day':'Next scene')+'</button></div>';
+document.querySelector('.meters').outerHTML=meters();
+const nx=document.getElementById('nx');nx.focus();nx.onclick=()=>{dead?deposed():last?end():(st.i++,scene(),window.scrollTo(0,0))}}
+function deposed(){const w=!st.a?['Your authority collapsed','Ministers, intendants and officers stop carrying out your orders. A faction of the court takes the palace, and you are removed from the throne.']:!st.l?['The nobles turned against you','The great families raise troops and march on Versailles. With no one left to defend you, the nobles depose you and rule in your name.']:['The treasury ran dry','Soldiers, officials and servants go unpaid. Creditors and furious officers storm the palace, and you are deposed.'];
+$.innerHTML='<h1>Deposed</h1>'+track()+meters()+'<section class="scene" style="border-left-color:var(--red)"><h2>'+w[0]+'</h2><p>'+w[1]+'</p><div class="hist"><strong>Why this was a real danger:</strong> Louis grew up during the Fronde (1648–53), when nobles and parlements rose in revolt against the crown and the boy king had to flee Paris. His whole system at Versailles was built to stop that happening again. Absolutism only works while it keeps authority, loyalty and money in balance. In 1688, just three years after this game’s date, England deposed its own king James II.</div><button class="next" id="re">Try again</button></section>';
+document.getElementById('re').onclick=()=>{Object.assign(st,{i:-1,a:5,l:5,m:5,pick:[]});intro();window.scrollTo(0,0)}}
+function end(){const n=st.pick.filter(Boolean).length;
+const v=st.a>=8&&st.l>=5?'You ruled as an absolute monarch: the nobility depends on you, and your will is law.':st.a>=8?'You hold great power, but resentment is building among the nobles.':st.l>=8?'The court loves you, but your own authority is thin. The nobles run the show.':'Your grip on power is uncertain. Louis managed to keep all three in balance for decades.';
+$.innerHTML='<h1>The candle is out</h1>'+track()+meters()+'<section class="scene"><p><strong>'+v+'</strong></p><p>You matched Louis’s real choice in '+n+' of '+S.length+' scenes. There was no “right” answer here: the game shows how each choice trades one kind of power for another.</p>'+
+S.map((s,i)=>'<div class="match"><span>'+(st.pick[i]?'✔':'✘')+'</span><span>'+s.h+'</span></div>').join('')+
+'<div class="hist"><strong>Myth check:</strong> “L’État, c’est moi” (“I am the state”) is probably something Louis never said. He did believe that he ruled by divine right, and Versailles was the machine that made that belief work every single day.</div>'+
+'<h2 style="font-size:1.5rem;margin-top:18px">Discuss</h2><ul class="q"><li>Why did Louis make nobles compete for tiny honours instead of simply ordering them around?</li><li>Which of the day’s choices cost France the most in the long run? Which brought Louis the most power?</li><li>How is a ruler’s public image used as a tool of power today?</li></ul><button class="next" id="re">Play again</button></section>';
+document.getElementById('re').onclick=()=>{Object.assign(st,{i:-1,a:5,l:5,m:5,pick:[]});intro();window.scrollTo(0,0)}}
+document.getElementById('tog').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark'};
+intro();
+</script>
+</body>
+</html>
